@@ -7,7 +7,7 @@
 local GITHUB_USER  = "joao10y6"
 local GITHUB_REPO  = "syntax-roblox"
 local GITHUB_BRANCH = "main"  -- troque para "master" se for o caso
-local ARQUIVO_MENU = "syntax.lua"  -- nome do arquivo principal dentro do repo
+local ARQUIVO_MENU = "syntax"  -- nome do arquivo principal dentro do repo
 
 local URL = string.format(
     "https://raw.githubusercontent.com/%s/%s/%s/%s",
