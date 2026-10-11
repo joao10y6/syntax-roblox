@@ -1,0 +1,69 @@
+-- ============================================================
+-- SYNTAX MENU v6.8 — LOADER
+-- Dono: NICOINFERNALX (UserId: 9375423697)
+-- Baixa e executa o menu do GitHub
+-- ============================================================
+
+local GITHUB_USER  = "joao10y6"
+local GITHUB_REPO  = "syntax-roblox"
+local GITHUB_BRANCH = "main"  -- troque para "master" se for o caso
+local ARQUIVO_MENU = "syntax.lua"  -- nome do arquivo principal dentro do repo
+
+local URL = string.format(
+    "https://raw.githubusercontent.com/%s/%s/%s/%s",
+    GITHUB_USER, GITHUB_REPO, GITHUB_BRANCH, ARQUIVO_MENU
+)
+
+-- ============================================================
+-- HttpGet compatível com vários executores
+-- ============================================================
+local function httpGet(url)
+    if game.HttpGet then
+        local ok, res = pcall(function() return game:HttpGet(url, true) end)
+        if ok and res and #res > 0 then return res end
+    end
+    if syn and syn.request then
+        local ok, res = pcall(function()
+            return syn.request({ Url = url, Method = "GET" }).Body
+        end)
+        if ok and res and #res > 0 then return res end
+    end
+    if http_request then
+        local ok, res = pcall(function()
+            return http_request({ Url = url, Method = "GET" }).Body
+        end)
+        if ok and res and #res > 0 then return res end
+    end
+    if request then
+        local ok, res = pcall(function()
+            return request({ Url = url, Method = "GET" }).Body
+        end)
+        if ok and res and #res > 0 then return res end
+    end
+    return nil
+end
+
+-- ============================================================
+-- Carrega o menu
+-- ============================================================
+print("[SYNTAX] Baixando menu de: " .. URL)
+
+local conteudo = httpGet(URL)
+if not conteudo or #conteudo < 50 then
+    warn("[SYNTAX] ❌ Não foi possível baixar o menu. Verifique sua internet ou o link do GitHub.")
+    return
+end
+
+local chunk, err = loadstring(conteudo, "@syntax.lua")
+if not chunk then
+    warn("[SYNTAX] ❌ Erro de sintaxe ao carregar: " .. tostring(err))
+    return
+end
+
+local ok, execErr = pcall(chunk)
+if not ok then
+    warn("[SYNTAX] ❌ Erro ao executar: " .. tostring(execErr))
+    return
+end
+
+print("[SYNTAX] ✅ Menu carregado com sucesso. Use INSERT para abrir.")
