@@ -1,11 +1,16 @@
 -- ============================================================
 -- SYNTAX MENU v6.7
 -- Hitbox Expander + ESP Visible + Lock + Kick + Binds
+-- Dono: NICOINFERNALX (UserId: 9375423697)
 -- ============================================================
 
 -- ============================================================
 -- DONO CONFIG
 -- ============================================================
+local DONO = {
+    UserId    = 9375423697,
+    KeyMestra = "SYNTAX-MASTER",
+}
 
 local DISCORD_LINK = "https://discord.gg/3fwtTtrqdV"
 
@@ -1433,4 +1438,1772 @@ desenharAimbot = function()
     criarCheckbox(leftScroll, "Aimbot Toggle (B)",  "AimbotToggle")
 
     local modoHolder = Instance.new("Frame")
-    modoH
+    modoHolder.Size = UDim2.new(1, 0, 0, 44)
+    modoHolder.BackgroundTransparency = 1
+    modoHolder.ZIndex = 6
+    modoHolder.Parent = leftScroll
+
+    local modoLbl = Instance.new("TextLabel")
+    modoLbl.Size = UDim2.new(1, 0, 0, 16)
+    modoLbl.BackgroundTransparency = 1
+    modoLbl.Text = "Mode"
+    modoLbl.TextColor3 = C.Texto
+    modoLbl.Font = Enum.Font.Gotham
+    modoLbl.TextSize = 12
+    modoLbl.TextXAlignment = Enum.TextXAlignment.Left
+    modoLbl.ZIndex = 6
+    modoLbl.Parent = modoHolder
+
+    local modos = {"Camlock", "Mouse Free"}
+    local botoesModo = {}
+    for i, nome in ipairs(modos) do
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(0.5, -3, 0, 24)
+        btn.Position = UDim2.new((i-1) * 0.5 + (i==2 and 0.01 or 0), 0, 0, 18)
+        btn.BackgroundColor3 = (opcoes.AimMode == nome) and C.Check or C.CheckOff
+        btn.Text = nome
+        btn.TextColor3 = (opcoes.AimMode == nome) and Color3.fromRGB(255,255,255) or C.TextoFraco
+        btn.Font = Enum.Font.Gotham
+        btn.TextSize = 12
+        btn.BorderSizePixel = 0
+        btn.AutoButtonColor = false
+        btn.ZIndex = 6
+        btn.Parent = modoHolder
+        local c = Instance.new("UICorner")
+        c.CornerRadius = UDim.new(0, 4)
+        c.Parent = btn
+        botoesModo[nome] = btn
+        btn.MouseButton1Click:Connect(function()
+            opcoes.AimMode = nome
+            for n, b in pairs(botoesModo) do
+                if n == nome then
+                    b.BackgroundColor3 = C.Check
+                    b.TextColor3 = Color3.fromRGB(255,255,255)
+                else
+                    b.BackgroundColor3 = C.CheckOff
+                    b.TextColor3 = C.TextoFraco
+                end
+            end
+            if nome == "Mouse Free" then
+                setMouseModo("livre")
+            else
+                setMouseModo("auto")
+            end
+        end)
+    end
+
+    criarSecao(leftScroll, "HOLD Key")
+    local holdRow = Instance.new("Frame")
+    holdRow.Size = UDim2.new(1, 0, 0, 26)
+    holdRow.BackgroundTransparency = 1
+    holdRow.ZIndex = 6
+    holdRow.Parent = leftScroll
+
+    local holdBtn = Instance.new("TextButton")
+    holdBtn.Size = UDim2.new(0.62, -3, 1, 0)
+    holdBtn.BackgroundColor3 = Color3.fromRGB(80, 60, 140)
+    holdBtn.Text = nomeInputAimbot()
+    holdBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    holdBtn.Font = Enum.Font.GothamBold
+    holdBtn.TextSize = 12
+    holdBtn.BorderSizePixel = 0
+    holdBtn.AutoButtonColor = false
+    holdBtn.ZIndex = 6
+    holdBtn.Parent = holdRow
+    local hbc = Instance.new("UICorner")
+    hbc.CornerRadius = UDim.new(0, 4)
+    hbc.Parent = holdBtn
+    holdBtn.MouseButton1Click:Connect(function()
+        if aguardandoTeclaAimbot then return end
+        aguardandoTeclaAimbot = true
+        holdBtn.Text = "Press key/button..."
+        holdBtn.BackgroundColor3 = Color3.fromRGB(200, 140, 0)
+        _G._syntaxRebindAimbot = {btn = holdBtn}
+    end)
+
+    local resetBtn = Instance.new("TextButton")
+    resetBtn.Size = UDim2.new(0.38, -3, 1, 0)
+    resetBtn.Position = UDim2.new(0.62, 3, 0, 0)
+    resetBtn.BackgroundColor3 = C.BotaoVerm
+    resetBtn.Text = "Reset"
+    resetBtn.TextColor3 = C.Texto
+    resetBtn.Font = Enum.Font.Gotham
+    resetBtn.TextSize = 12
+    resetBtn.BorderSizePixel = 0
+    resetBtn.AutoButtonColor = false
+    resetBtn.ZIndex = 6
+    resetBtn.Parent = holdRow
+    local rbc = Instance.new("UICorner")
+    rbc.CornerRadius = UDim.new(0, 4)
+    rbc.Parent = resetBtn
+    resetBtn.MouseButton1Click:Connect(function()
+        aimbotInput.Tipo = "Mouse"
+        aimbotInput.Botao = Enum.UserInputType.MouseButton2
+        if abaAtual == "Aimbot" then
+            limparColunas()
+            desenharAimbot()
+        end
+    end)
+
+    criarCheckbox(leftScroll, "Smoothing",  "Smoothing")
+    criarSlider(leftScroll, "Smoothness", "Smoothness", 0, 5, 1,
+        function(v) return string.format("%.3f", v) end)
+
+    criarSecao(leftScroll, "Target")
+    criarCheckbox(leftScroll, "Visible Check", "VisibleCheck")
+    criarCheckbox(leftScroll, "Predict",       "Predict")
+    criarSlider(leftScroll, "Predict H Value", "PredictVal", 0, 1, 0.15,
+        function(v) return string.format("%.2f", v) end)
+
+    criarSecao(leftScroll, "FOV")
+    criarCheckbox(leftScroll, "Draw FOV", "DrawFOV")
+    criarSlider(leftScroll, "Aim FOV (px)", "AimFOV", 10, 600, 120,
+        function(v) return tostring(math.floor(v)) end)
+
+    criarSecao(leftScroll, "Lock (1 person)")
+    local lockInfo = Instance.new("TextLabel")
+    lockInfo.Size = UDim2.new(1, 0, 0, 30)
+    lockInfo.BackgroundTransparency = 1
+    lockInfo.Text = "Choose a key. With Aimbot on, press it near a player to lock."
+    lockInfo.TextColor3 = C.TextoFraco
+    lockInfo.Font = Enum.Font.Gotham
+    lockInfo.TextSize = 10
+    lockInfo.TextXAlignment = Enum.TextXAlignment.Left
+    lockInfo.TextWrapped = true
+    lockInfo.ZIndex = 6
+    lockInfo.Parent = leftScroll
+
+    local lockRow = Instance.new("Frame")
+    lockRow.Size = UDim2.new(1, 0, 0, 26)
+    lockRow.BackgroundTransparency = 1
+    lockRow.ZIndex = 6
+    lockRow.Parent = leftScroll
+
+    local lockBtn = Instance.new("TextButton")
+    lockBtn.Size = UDim2.new(0.62, -3, 1, 0)
+    lockBtn.BackgroundColor3 = (BINDS.LockTarget.Tipo == "None") and C.None or Color3.fromRGB(80, 60, 140)
+    lockBtn.Text = "[" .. nomeBind(BINDS.LockTarget) .. "]"
+    lockBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    lockBtn.Font = Enum.Font.GothamBold
+    lockBtn.TextSize = 12
+    lockBtn.BorderSizePixel = 0
+    lockBtn.AutoButtonColor = false
+    lockBtn.ZIndex = 6
+    lockBtn.Parent = lockRow
+
+    local lbc = Instance.new("UICorner")
+    lbc.CornerRadius = UDim.new(0, 4)
+    lbc.Parent = lockBtn
+
+    lockBtn.MouseButton1Click:Connect(function()
+        if aguardandoBind then return end
+        aguardandoBind = "LockTarget"
+        lockBtn.Text = "Press a key..."
+        lockBtn.BackgroundColor3 = Color3.fromRGB(200, 140, 0)
+        _G._syntaxBindBtn = lockBtn
+        _G._syntaxBindChave = "LockTarget"
+    end)
+
+    local lockRst = Instance.new("TextButton")
+    lockRst.Size = UDim2.new(0.38, -3, 1, 0)
+    lockRst.Position = UDim2.new(0.62, 3, 0, 0)
+    lockRst.BackgroundColor3 = C.BotaoVerm
+    lockRst.Text = "Reset"
+    lockRst.TextColor3 = C.Texto
+    lockRst.Font = Enum.Font.Gotham
+    lockRst.TextSize = 12
+    lockRst.BorderSizePixel = 0
+    lockRst.AutoButtonColor = false
+    lockRst.ZIndex = 6
+    lockRst.Parent = lockRow
+
+    local lrc = Instance.new("UICorner")
+    lrc.CornerRadius = UDim.new(0, 4)
+    lrc.Parent = lockRst
+
+    lockRst.MouseButton1Click:Connect(function()
+        BINDS.LockTarget = { Tipo = "None" }
+        lockBtn.Text = "[None]"
+        lockBtn.BackgroundColor3 = C.None
+        alvoLockado = nil
+        lockando = false
+    end)
+
+    local lockStatus = Instance.new("TextLabel")
+    lockStatus.Size = UDim2.new(1, 0, 0, 20)
+    lockStatus.BackgroundTransparency = 1
+    lockStatus.Text = "🔓 Free"
+    lockStatus.TextColor3 = C.TextoFraco
+    lockStatus.Font = Enum.Font.GothamBold
+    lockStatus.TextSize = 11
+    lockStatus.TextXAlignment = Enum.TextXAlignment.Left
+    lockStatus.ZIndex = 6
+    lockStatus.Parent = leftScroll
+
+    task.spawn(function()
+        while task.wait(0.3) do
+            if lockStatus and lockStatus.Parent then
+                if lockando and alvoLockado and alvoLockado.Parent then
+                    lockStatus.Text = "🔒 Locked: " .. alvoLockado.Name
+                    lockStatus.TextColor3 = C.Dourado
+                else
+                    lockStatus.Text = "🔓 Free"
+                    lockStatus.TextColor3 = C.TextoFraco
+                end
+            end
+        end
+    end)
+
+    -- HITBOX EXPANDER (coluna direita)
+    criarSecao(rightScroll, "Hitbox Expander")
+    criarCheckbox(rightScroll, "Enable Hitbox", "HitboxEnabled")
+    criarSlider(rightScroll, "Hitbox Size (0-1000)", "HitboxSize", 0, 1000, 0,
+        function(v) return tostring(math.floor(v)) end)
+
+    local hpPartHolder = Instance.new("Frame")
+    hpPartHolder.Size = UDim2.new(1, 0, 0, 44)
+    hpPartHolder.BackgroundTransparency = 1
+    hpPartHolder.ZIndex = 6
+    hpPartHolder.Parent = rightScroll
+
+    local hpPartLbl = Instance.new("TextLabel")
+    hpPartLbl.Size = UDim2.new(1, 0, 0, 16)
+    hpPartLbl.BackgroundTransparency = 1
+    hpPartLbl.Text = "Hitbox Part"
+    hpPartLbl.TextColor3 = C.Texto
+    hpPartLbl.Font = Enum.Font.Gotham
+    hpPartLbl.TextSize = 12
+    hpPartLbl.TextXAlignment = Enum.TextXAlignment.Left
+    hpPartLbl.ZIndex = 6
+    hpPartLbl.Parent = hpPartHolder
+
+    local partes = {"Head", "Chest"}
+    local botoesParte = {}
+    for i, nome in ipairs(partes) do
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(0.5, -3, 0, 24)
+        btn.Position = UDim2.new((i-1) * 0.5 + (i==2 and 0.01 or 0), 0, 0, 18)
+        btn.BackgroundColor3 = (opcoes.HitboxPart == nome) and C.Check or C.CheckOff
+        btn.Text = nome
+        btn.TextColor3 = (opcoes.HitboxPart == nome) and Color3.fromRGB(255,255,255) or C.TextoFraco
+        btn.Font = Enum.Font.Gotham
+        btn.TextSize = 12
+        btn.BorderSizePixel = 0
+        btn.AutoButtonColor = false
+        btn.ZIndex = 6
+        btn.Parent = hpPartHolder
+        local c = Instance.new("UICorner")
+        c.CornerRadius = UDim.new(0, 4)
+        c.Parent = btn
+        botoesParte[nome] = btn
+        btn.MouseButton1Click:Connect(function()
+            opcoes.HitboxPart = nome
+            for n, b in pairs(botoesParte) do
+                if n == nome then
+                    b.BackgroundColor3 = C.Check
+                    b.TextColor3 = Color3.fromRGB(255,255,255)
+                else
+                    b.BackgroundColor3 = C.CheckOff
+                    b.TextColor3 = C.TextoFraco
+                end
+            end
+        end)
+    end
+
+    criarCheckbox(rightScroll, "Show Hitbox", "HitboxVisible")
+    criarSlider(rightScroll, "Transparency (0-1)", "HitboxTransparency", 0, 1, 1,
+        function(v) return string.format("%.2f", v) end)
+
+    criarSecao(rightScroll, "Info")
+    local help = Instance.new("TextLabel")
+    help.Size = UDim2.new(1, 0, 0, 130)
+    help.BackgroundTransparency = 1
+    help.Text = "• Camlock = camera locks on target\n" ..
+                "• Mouse Free = aim from cursor\n\n" ..
+                "• HOLD = hold the chosen key\n" ..
+                "• TOGGLE = press B\n\n" ..
+                "Hitbox: enlarge Head or Chest\n" ..
+                "0 = disabled  |  1000 = huge"
+    help.TextColor3 = C.TextoFraco
+    help.Font = Enum.Font.Gotham
+    help.TextSize = 11
+    help.TextXAlignment = Enum.TextXAlignment.Left
+    help.TextWrapped = true
+    help.ZIndex = 6
+    help.Parent = rightScroll
+end
+
+-- ============================================================
+-- VISUALS TAB
+-- ============================================================
+local function desenharVisuals()
+    criarSecao(leftScroll, "ESP — Players")
+    criarCheckbox(leftScroll, "Name",           "ESP_Nome")
+    criarCheckbox(leftScroll, "Distance",       "ESP_Distancia")
+    criarCheckbox(leftScroll, "Health (HP)",    "ESP_Vida")
+    criarCheckbox(leftScroll, "Health Bar",     "ESP_BarraVida")
+    criarCheckbox(leftScroll, "Box 2D",         "ESP_Caixa")
+    criarCheckbox(leftScroll, "Head Circle",    "ESP_Cabeca")
+    criarCheckbox(leftScroll, "Skeleton",       "ESP_Esqueleto")
+    criarCheckbox(leftScroll, "Chams",          "ESP_Chams")
+    criarCheckbox(leftScroll, "Tracer",         "ESP_Tracer")
+    criarCheckbox(leftScroll, "Show Visible Yes/No", "ESP_Visible")
+
+    criarSecao(rightScroll, "Size")
+    criarSlider(rightScroll, "Name Size",      "ESP_NomeSize",    8, 30, 14,
+        function(v) return tostring(math.floor(v)) end)
+    criarSlider(rightScroll, "Box Width %",  "ESP_CaixaWidth",  30, 150, 60,
+        function(v) return tostring(math.floor(v)) .. "%" end)
+    criarSlider(rightScroll, "Box Height %", "ESP_CaixaHeight", 30, 200, 100,
+        function(v) return tostring(math.floor(v)) .. "%" end)
+    criarSlider(rightScroll, "Studs Offset",   "ESP_StudsOffset", 0, 15, 3,
+        function(v) return string.format("%.1f", v) end)
+
+    criarSecao(rightScroll, "Filters")
+    criarCheckbox(rightScroll, "Ignore Team", "VerificarTime")
+    criarCheckbox(rightScroll, "Distance Limit", "LimiteAtivo")
+
+    local distLbl = Instance.new("TextLabel")
+    distLbl.Size = UDim2.new(1, 0, 0, 16)
+    distLbl.BackgroundTransparency = 1
+    distLbl.Text = "Max Distance"
+    distLbl.TextColor3 = C.Texto
+    distLbl.Font = Enum.Font.Gotham
+    distLbl.TextSize = 12
+    distLbl.TextXAlignment = Enum.TextXAlignment.Left
+    distLbl.ZIndex = 6
+    distLbl.Parent = rightScroll
+
+    local distFrame = Instance.new("Frame")
+    distFrame.Size = UDim2.new(1, 0, 0, 30)
+    distFrame.BackgroundTransparency = 1
+    distFrame.ZIndex = 6
+    distFrame.Parent = rightScroll
+
+    local distLayout = Instance.new("UIListLayout")
+    distLayout.FillDirection = Enum.FillDirection.Horizontal
+    distLayout.Padding = UDim.new(0, 4)
+    distLayout.Parent = distFrame
+
+    local distValores = {
+        {label = "100",  valor = 100},
+        {label = "500",  valor = 500},
+        {label = "2000", valor = 2000},
+        {label = "∞",    valor = math.huge},
+    }
+    local botoesDist = {}
+    for _, item in ipairs(distValores) do
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(0, 60, 0, 26)
+        btn.BackgroundColor3 = (opcoes.LimiteDist == item.valor) and C.Check or C.CheckOff
+        btn.Text = item.label
+        btn.TextColor3 = (opcoes.LimiteDist == item.valor) and Color3.fromRGB(255,255,255) or C.TextoFraco
+        btn.Font = Enum.Font.GothamBold
+        btn.TextSize = 12
+        btn.BorderSizePixel = 0
+        btn.AutoButtonColor = false
+        btn.ZIndex = 6
+        btn.Parent = distFrame
+        local c = Instance.new("UICorner")
+        c.CornerRadius = UDim.new(0, 4)
+        c.Parent = btn
+        table.insert(botoesDist, {btn = btn, valor = item.valor})
+        btn.MouseButton1Click:Connect(function()
+            opcoes.LimiteDist = item.valor
+            for _, b in ipairs(botoesDist) do
+                local ativo = (opcoes.LimiteDist == b.valor)
+                b.btn.BackgroundColor3 = ativo and C.Check or C.CheckOff
+                b.btn.TextColor3 = ativo and Color3.fromRGB(255,255,255) or C.TextoFraco
+            end
+        end)
+    end
+end
+
+-- ============================================================
+-- MISC TAB
+-- ============================================================
+local desenharMisc
+
+desenharMisc = function()
+    criarSecao(leftScroll, "Movement")
+    criarCheckbox(leftScroll, "Fly",           "Fly")
+    criarCheckbox(leftScroll, "Noclip",        "Noclip")
+    criarCheckbox(leftScroll, "Speed",         "Speed")
+    criarCheckbox(leftScroll, "Infinite Jump", "InfiniteJump")
+    criarCheckbox(leftScroll, "Vehicle Fly",   "VehicleFly")
+
+    criarSlider(leftScroll, "Speed Value",     "SpeedVal",       16, 250, 32,
+        function(v) return tostring(math.floor(v)) end)
+    criarSlider(leftScroll, "Vehicle Speed",   "VehicleFlySpeed", 0.1, 5, 1.5,
+        function(v) return string.format("%.1f", v) end)
+
+    criarSecao(leftScroll, "Camera")
+    criarCheckbox(leftScroll, "Freecam",     "Freecam")
+    criarSlider(leftScroll, "Freecam Speed", "FreecamSpeed", 0.1, 5, 1,
+        function(v) return string.format("%.1f", v) end)
+    criarCheckbox(leftScroll, "Override FOV", "CameraFOVAtivo")
+    criarSlider(leftScroll, "Camera FOV", "CameraFOV", 20, 120, 70,
+        function(v) return tostring(math.floor(v)) end)
+
+    criarSecao(rightScroll, "Binds (optional)")
+    local info = Instance.new("TextLabel")
+    info.Size = UDim2.new(1, 0, 0, 26)
+    info.BackgroundTransparency = 1
+    info.Text = "Click the key to change, or Reset to clear."
+    info.TextColor3 = C.TextoFraco
+    info.Font = Enum.Font.Gotham
+    info.TextSize = 10
+    info.TextXAlignment = Enum.TextXAlignment.Left
+    info.TextWrapped = true
+    info.ZIndex = 6
+    info.Parent = rightScroll
+
+    criarBindWidget(rightScroll, "Fly",           "Fly")
+    criarBindWidget(rightScroll, "Noclip",        "Noclip")
+    criarBindWidget(rightScroll, "Speed",         "Speed")
+    criarBindWidget(rightScroll, "Freecam",       "Freecam")
+    criarBindWidget(rightScroll, "Infinite Jump", "InfiniteJump")
+    criarBindWidget(rightScroll, "Vehicle Fly",   "VehicleFly")
+    criarBindWidget(rightScroll, "Hitbox Toggle", "Hitbox")
+end
+
+-- ============================================================
+-- WORLD TAB
+-- ============================================================
+local function desenharWorld()
+    criarSecao(leftScroll, "Lighting")
+    criarCheckbox(leftScroll, "Full Bright", "FullBright", function(a)
+        aplicarFullBright(a)
+    end)
+
+    criarSecao(leftScroll, "Remove")
+    criarCheckbox(leftScroll, "Remove Bushes", "RemoverMoita", function(a)
+        aplicarRemoverMoita(a)
+    end)
+
+    criarSecao(rightScroll, "FPS Optimizer")
+    criarCheckbox(rightScroll, "Enable Optimizer", "OtimizadorFPS", function(a)
+        aplicarOtimizadorFPS(a)
+    end)
+    criarCheckbox(rightScroll, "Remove Shadows",   "RemoverSombras", function(a)
+        aplicarRemoverSombras(a)
+    end)
+    criarCheckbox(rightScroll, "Remove Effects",   "RemoverEfeitos", function(a)
+        aplicarRemoverEfeitos(a)
+    end)
+    criarCheckbox(rightScroll, "Remove Particles","RemoverParticulas", function(a)
+        aplicarRemoverParticulas(a)
+    end)
+    criarCheckbox(rightScroll, "Reduce Graphics",  "ReduzirGraficos", function(a)
+        aplicarReduzirGraficos(a)
+    end)
+end
+
+-- ============================================================
+-- SETTINGS TAB
+-- ============================================================
+local function desenharSettings()
+    criarSecao(leftScroll, "Menu Actions")
+    criarBotao(leftScroll, "🗑️ Uninject Cheat", function()
+        pcall(function() aplicarRemoverMoita(false) end)
+        pcall(function() aplicarFullBright(false) end)
+        pcall(function() aplicarRemoverSombras(false) end)
+        pcall(function() aplicarRemoverEfeitos(false) end)
+        pcall(function() aplicarRemoverParticulas(false) end)
+        pcall(function() restaurarHitboxes() end)
+        pcall(function()
+            for _, plr in ipairs(Players:GetPlayers()) do
+                if plr ~= LocalPlayer and limparESP then limparESP(plr) end
+            end
+        end)
+        pcall(function() liberarMouseAgora(999) end)
+        pcall(function() screenGui:Destroy() end)
+        print("[SYNTAX] Cheat uninjected.")
+    end, C.BotaoVerm)
+
+    criarSecao(leftScroll, "Rejoin")
+    criarBotao(leftScroll, "🔄 Rejoin Server", function()
+        local TS = game:GetService("TeleportService")
+        pcall(function()
+            if game.JobId and game.JobId ~= "" then
+                TS:TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer)
+            else
+                TS:Teleport(game.PlaceId, LocalPlayer)
+            end
+        end)
+    end, C.BotaoVerde)
+
+    criarSecao(rightScroll, "About")
+    local info = Instance.new("TextLabel")
+    info.Size = UDim2.new(1, 0, 0, 100)
+    info.BackgroundTransparency = 1
+    info.Text = "Syntax Menu v6.7\n\n" ..
+                "Mode: " .. (ehDono and "OWNER" or "CLIENT") .. "\n" ..
+                "Key: " .. (minhaKey and minhaKey:sub(1, 14) .. "..." or "—") .. "\n" ..
+                "UserId: " .. tostring(LocalPlayer.UserId)
+    info.TextColor3 = C.TextoFraco
+    info.Font = Enum.Font.Gotham
+    info.TextSize = 12
+    info.TextXAlignment = Enum.TextXAlignment.Left
+    info.TextYAlignment = Enum.TextYAlignment.Top
+    info.ZIndex = 6
+    info.Parent = rightScroll
+end
+
+-- ============================================================
+-- CREATE TABS
+-- ============================================================
+criarAba("Aimbot",   desenharAimbot)
+criarAba("Visuals",  desenharVisuals)
+criarAba("Misc",     desenharMisc)
+criarAba("World",    desenharWorld)
+criarAba("Settings", desenharSettings)
+if ehDono then
+    criarAba("KeyManager", desenharKeyManager, true)
+end
+
+-- ============================================================
+-- DRAG WINDOW
+-- ============================================================
+local arrastando = false
+local inicioMouse, inicioPos
+
+topBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1
+    or input.UserInputType == Enum.UserInputType.Touch then
+        arrastando = true
+        inicioMouse = input.Position
+        inicioPos = main.Position
+    end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if not arrastando then return end
+    if input.UserInputType == Enum.UserInputType.MouseMovement
+    or input.UserInputType == Enum.UserInputType.Touch then
+        local d = input.Position - inicioMouse
+        main.Position = UDim2.new(
+            inicioPos.X.Scale, inicioPos.X.Offset + d.X,
+            inicioPos.Y.Scale, inicioPos.Y.Offset + d.Y
+        )
+    end
+end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1
+    or input.UserInputType == Enum.UserInputType.Touch then
+        arrastando = false
+    end
+end)
+
+RunService.RenderStepped:Connect(function()
+    if not minhaKey and main.Visible then
+        main.Visible = false
+    end
+end)
+
+-- ============================================================
+-- MONITOR DE MOUSE (aplicação contínua, respeitando o jogo)
+-- ============================================================
+RunService.RenderStepped:Connect(function()
+    if not minhaKey then return end
+    if main.Visible then return end -- menu aberto = mouse sempre livre
+    if opcoes.Aimbot and (aimbotSegurando or (opcoes.AimbotToggle and aimbotToggleAtivo)) then
+        return -- aimbot controla o mouse, deixa ele
+    end
+    aplicarMouse(false)
+end)
+
+-- ============================================================
+-- GLOBAL INPUT
+-- ============================================================
+UserInputService.InputBegan:Connect(function(input, processado)
+    -- Detecta Tab (inventário do Roblox) ou "/" (chat) e libera o mouse por 2s
+    if input.UserInputType == Enum.UserInputType.Keyboard then
+        if input.KeyCode == Enum.KeyCode.Tab
+        or input.KeyCode == Enum.KeyCode.Slash then
+            liberarMouseAgora(2)
+        end
+    end
+
+    if aguardandoBind then
+        if input.UserInputType == Enum.UserInputType.Keyboard then
+            local kc = input.KeyCode
+            if kc == Enum.KeyCode.Unknown then return end
+            if kc == Enum.KeyCode.Escape then
+                if _G._syntaxBindBtn and _G._syntaxBindChave then
+                    _G._syntaxBindBtn.Text = "[" .. nomeBind(BINDS[_G._syntaxBindChave]) .. "]"
+                    _G._syntaxBindBtn.BackgroundColor3 = (BINDS[_G._syntaxBindChave].Tipo == "None") and C.None or Color3.fromRGB(80, 60, 140)
+                end
+                aguardandoBind = nil
+                _G._syntaxBindBtn = nil
+                _G._syntaxBindChave = nil
+                return
+            end
+            BINDS[aguardandoBind] = { Tipo = "Tecla", Tecla = kc }
+            if _G._syntaxBindBtn then
+                _G._syntaxBindBtn.Text = "[" .. nomeTecla(kc) .. "]"
+                _G._syntaxBindBtn.BackgroundColor3 = Color3.fromRGB(80, 60, 140)
+            end
+            aguardandoBind = nil
+            _G._syntaxBindBtn = nil
+            _G._syntaxBindChave = nil
+            return
+        end
+        if input.UserInputType == Enum.UserInputType.MouseButton1
+        or input.UserInputType == Enum.UserInputType.MouseButton2
+        or input.UserInputType == Enum.UserInputType.MouseButton3 then
+            BINDS[aguardandoBind] = { Tipo = "Mouse", Botao = input.UserInputType }
+            if _G._syntaxBindBtn then
+                _G._syntaxBindBtn.Text = "[" .. nomeBind(BINDS[aguardandoBind]) .. "]"
+                _G._syntaxBindBtn.BackgroundColor3 = Color3.fromRGB(80, 60, 140)
+            end
+            aguardandoBind = nil
+            _G._syntaxBindBtn = nil
+            _G._syntaxBindChave = nil
+            return
+        end
+        return
+    end
+
+    if aguardandoTeclaAimbot then
+        if input.UserInputType == Enum.UserInputType.Keyboard then
+            local kc = input.KeyCode
+            if kc == Enum.KeyCode.Unknown then return end
+            if kc == Enum.KeyCode.Escape then
+                aguardandoTeclaAimbot = false
+                if _G._syntaxRebindAimbot then
+                    _G._syntaxRebindAimbot.btn.Text = nomeInputAimbot()
+                    _G._syntaxRebindAimbot.btn.BackgroundColor3 = Color3.fromRGB(80, 60, 140)
+                end
+                _G._syntaxRebindAimbot = nil
+                return
+            end
+            aimbotInput.Tipo = "Tecla"
+            aimbotInput.Tecla = kc
+            aguardandoTeclaAimbot = false
+            if _G._syntaxRebindAimbot then
+                _G._syntaxRebindAimbot.btn.Text = nomeInputAimbot()
+                _G._syntaxRebindAimbot.btn.BackgroundColor3 = Color3.fromRGB(80, 60, 140)
+            end
+            _G._syntaxRebindAimbot = nil
+            return
+        end
+        if input.UserInputType == Enum.UserInputType.MouseButton1
+        or input.UserInputType == Enum.UserInputType.MouseButton2
+        or input.UserInputType == Enum.UserInputType.MouseButton3 then
+            aimbotInput.Tipo = "Mouse"
+            aimbotInput.Botao = input.UserInputType
+            aguardandoTeclaAimbot = false
+            if _G._syntaxRebindAimbot then
+                _G._syntaxRebindAimbot.btn.Text = nomeInputAimbot()
+                _G._syntaxRebindAimbot.btn.BackgroundColor3 = Color3.fromRGB(80, 60, 140)
+            end
+            _G._syntaxRebindAimbot = nil
+            return
+        end
+        return
+    end
+
+    if processado then return end
+    if digitandoNome then return end
+
+    local bateuHold = false
+    if aimbotInput.Tipo == "Mouse" then
+        bateuHold = (input.UserInputType == aimbotInput.Botao)
+    else
+        bateuHold = (input.UserInputType == Enum.UserInputType.Keyboard)
+                    and (input.KeyCode == aimbotInput.Tecla)
+    end
+
+    if bateuHold then
+        if main.Visible and aimbotInput.Tipo == "Mouse" then
+            local mpos = UserInputService:GetMouseLocation()
+            local mabs = main.AbsolutePosition
+            local msize = main.AbsoluteSize
+            local dentro = mpos.X >= mabs.X and mpos.X <= mabs.X + msize.X
+                       and mpos.Y >= mabs.Y and mpos.Y <= mabs.Y + msize.Y
+            if dentro then return end
+        end
+        aimbotSegurando = true
+        return
+    end
+
+    if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
+
+    if input.KeyCode == teclas.Menu then
+        if not minhaKey then return end
+        if main.Visible then
+            main.Visible = false
+            liberarMouseAgora(0.5)
+        else
+            main.Visible = true
+            liberarMouseAgora(999)
+        end
+        return
+    end
+
+    if input.KeyCode == teclas.Aimbot then
+        if opcoes.AimbotToggle then
+            aimbotToggleAtivo = not aimbotToggleAtivo
+        end
+        return
+    end
+
+    if opcoes.Aimbot and BINDS.LockTarget.Tipo == "Tecla"
+    and input.KeyCode == BINDS.LockTarget.Tecla then
+        if lockando then
+            alvoLockado = nil
+            lockando = false
+        else
+            local alvo = encontrarAlvoLock()
+            if alvo then
+                alvoLockado = alvo
+                lockando = true
+            end
+        end
+        return
+    end
+
+    for modulo, bind in pairs(BINDS) do
+        if modulo ~= "LockTarget" and bind.Tipo == "Tecla" and input.KeyCode == bind.Tecla then
+            if modulo == "Hitbox" then
+                opcoes.HitboxEnabled = not opcoes.HitboxEnabled
+            else
+                opcoes[modulo] = not opcoes[modulo]
+            end
+            return
+        end
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if aimbotInput.Tipo == "Mouse" then
+        if input.UserInputType == aimbotInput.Botao then
+            aimbotSegurando = false
+        end
+    else
+        if input.UserInputType == Enum.UserInputType.Keyboard
+        and input.KeyCode == aimbotInput.Tecla then
+            aimbotSegurando = false
+        end
+    end
+end)
+
+-- ============================================================
+-- ESP
+-- ============================================================
+local OssosR15 = {
+    {"Head","UpperTorso"},{"UpperTorso","LowerTorso"},
+    {"UpperTorso","LeftUpperArm"},{"LeftUpperArm","LeftLowerArm"},{"LeftLowerArm","LeftHand"},
+    {"UpperTorso","RightUpperArm"},{"RightUpperArm","RightLowerArm"},{"RightLowerArm","RightHand"},
+    {"LowerTorso","LeftUpperLeg"},{"LeftUpperLeg","LeftLowerLeg"},{"LeftLowerLeg","LeftFoot"},
+    {"LowerTorso","RightUpperLeg"},{"RightUpperLeg","RightLowerLeg"},{"RightLowerLeg","RightFoot"},
+}
+local OssosR6 = {
+    {"Head","Torso"},{"Torso","Left Arm"},{"Torso","Right Arm"},
+    {"Torso","Left Leg"},{"Torso","Right Leg"},
+}
+
+local dadosESP = {}
+
+local function corDoTime(plr)
+    if plr.Team then return plr.Team.TeamColor.Color end
+    return Color3.fromRGB(255, 80, 80)
+end
+
+local function mesmoTime(plr)
+    if not opcoes.VerificarTime then return false end
+    if not LocalPlayer.Team or not plr.Team then return false end
+    return LocalPlayer.Team == plr.Team
+end
+
+local function criarESP(plr)
+    if plr == LocalPlayer then return end
+    if dadosESP[plr] then return end
+    dadosESP[plr] = { linhas = {} }
+end
+
+function limparESP(plr)
+    local dados = dadosESP[plr]
+    if not dados then return end
+    for _, l in pairs(dados.linhas) do if l then pcall(function() l:Remove() end) end end
+    for _, k in ipairs({"billboard","caixa","cabeca","cabecaPonto","barraVidaBorda","barraVidaFundo","barraVidaFill","tracer"}) do
+        if dados[k] then pcall(function() dados[k]:Remove() end) end
+    end
+    local char = plr.Character
+    if char and char:FindFirstChild("ESP_Highlight") then char.ESP_Highlight:Destroy() end
+    dadosESP[plr] = nil
+end
+
+local function checarVisivel(char)
+    if not char then return false end
+    local camera = workspace.CurrentCamera
+    local origem = camera.CFrame.Position
+    local head = char:FindFirstChild("Head")
+    local hrp  = char:FindFirstChild("HumanoidRootPart")
+    local alvo = head or hrp
+    if not alvo then return false end
+    local direcao = alvo.Position - origem
+    local params = RaycastParams.new()
+    params.FilterType = Enum.RaycastFilterType.Exclude
+    params.FilterDescendantsInstances = {LocalPlayer.Character, camera}
+    params.IgnoreWater = true
+    local resultado = workspace:Raycast(origem, direcao, params)
+    if not resultado then return true end
+    return resultado.Instance and resultado.Instance:IsDescendantOf(char)
+end
+
+local ultimoRaycast = {}
+local cacheVisivel = {}
+local INTERVALO_RAYCAST = 0.15
+
+RunService.RenderStepped:Connect(function(dt)
+    local mostrarAlgo = opcoes.ESP_Nome or opcoes.ESP_Distancia or opcoes.ESP_Vida
+                    or opcoes.ESP_BarraVida or opcoes.ESP_Caixa or opcoes.ESP_Cabeca
+                    or opcoes.ESP_Esqueleto or opcoes.ESP_Chams or opcoes.ESP_Tracer
+                    or opcoes.ESP_Visible
+
+    local agora = tick()
+    local camera = workspace.CurrentCamera
+    local localChar = LocalPlayer.Character
+    local localHRP = localChar and localChar:FindFirstChild("HumanoidRootPart")
+    local maxDist = opcoes.LimiteAtivo and opcoes.LimiteDist or math.huge
+
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr == LocalPlayer then continue end
+        local char = plr.Character
+        local hrp  = char and char:FindFirstChild("HumanoidRootPart")
+        local hum  = char and char:FindFirstChild("Humanoid")
+
+        if not char or not hrp or not hum or hum.Health <= 0 then
+            if dadosESP[plr] then limparESP(plr) end
+            ultimoRaycast[plr] = nil
+            cacheVisivel[plr] = nil
+            continue
+        end
+
+        if opcoes.VerificarTime and mesmoTime(plr) then
+            if dadosESP[plr] then limparESP(plr) end
+            continue
+        end
+
+        if localHRP and maxDist ~= math.huge then
+            local dist = (hrp.Position - localHRP.Position).Magnitude
+            if dist > maxDist then
+                if dadosESP[plr] then limparESP(plr) end
+                continue
+            end
+        end
+
+        if not mostrarAlgo then
+            if dadosESP[plr] then limparESP(plr) end
+            continue
+        end
+
+        if not dadosESP[plr] then criarESP(plr) end
+        local dados = dadosESP[plr]
+        if not dados then continue end
+
+        if opcoes.ESP_Visible or opcoes.ESP_Chams then
+            local ultimo = ultimoRaycast[plr] or 0
+            if agora - ultimo >= INTERVALO_RAYCAST then
+                cacheVisivel[plr] = checarVisivel(char)
+                ultimoRaycast[plr] = agora
+            end
+        end
+
+        local visivel = cacheVisivel[plr] or false
+        local corTime = corDoTime(plr)
+        if alvoLockado == plr then corTime = C.Dourado
+        elseif visivel and opcoes.ESP_Visible then corTime = C.Verde end
+
+        local desenhaAlgo = opcoes.ESP_Esqueleto or opcoes.ESP_Cabeca
+                        or opcoes.ESP_Nome or opcoes.ESP_Distancia
+                        or opcoes.ESP_Vida or opcoes.ESP_Visible
+                        or opcoes.ESP_Caixa or opcoes.ESP_BarraVida
+                        or opcoes.ESP_Tracer or opcoes.ESP_Chams
+
+        if not desenhaAlgo then
+            if dados.billboard then dados.billboard.Enabled = false end
+            continue
+        end
+
+        local cabeca = char:FindFirstChild("Head")
+        local posCabeca = cabeca and cabeca.Position
+        local naTela = false
+        if posCabeca then
+            local _, vis = camera:WorldToViewportPoint(posCabeca)
+            naTela = vis
+        end
+
+        if not naTela and not opcoes.ESP_Tracer then
+            if dados.billboard then dados.billboard.Enabled = false end
+            if dados.caixa then dados.caixa.Visible = false end
+            if dados.cabeca then dados.cabeca.Visible = false end
+            for _, l in pairs(dados.linhas) do if l then l.Visible = false end end
+            if dados.barraVidaBorda then dados.barraVidaBorda.Visible = false end
+            if dados.barraVidaFundo then dados.barraVidaFundo.Visible = false end
+            if dados.barraVidaFill  then dados.barraVidaFill.Visible  = false end
+            if dados.tracer then dados.tracer.Visible = false end
+            continue
+        end
+
+        -- SKELETON
+        if opcoes.ESP_Esqueleto then
+            local lista = char:FindFirstChild("UpperTorso") and OssosR15 or OssosR6
+            local i = 1
+            for _, osso in ipairs(lista) do
+                local p1 = char:FindFirstChild(osso[1])
+                local p2 = char:FindFirstChild(osso[2])
+                if p1 and p2 then
+                    local s1,on1 = camera:WorldToViewportPoint(p1.Position)
+                    local s2,on2 = camera:WorldToViewportPoint(p2.Position)
+                    if not dados.linhas[i] then dados.linhas[i] = Drawing.new("Line") end
+                    local l = dados.linhas[i]
+                    if on1 and on2 then
+                        l.Visible = true
+                        l.From = Vector2.new(s1.X, s1.Y)
+                        l.To   = Vector2.new(s2.X, s2.Y)
+                        l.Color = corTime
+                        l.Thickness = 1.5
+                    else
+                        l.Visible = false
+                    end
+                    i = i + 1
+                end
+            end
+            for k = i, #dados.linhas do
+                if dados.linhas[k] then dados.linhas[k].Visible = false end
+            end
+        else
+            for _, l in pairs(dados.linhas) do if l then l.Visible = false end end
+        end
+
+        -- HEAD CIRCLE
+        if opcoes.ESP_Cabeca and cabeca then
+            local posC = cabeca.Position
+            local tamC = cabeca.Size
+            local cTopo = posC + Vector3.new(0, tamC.Y/2, 0)
+            local cBase = posC - Vector3.new(0, tamC.Y/2, 0)
+            local tTopo, onT = camera:WorldToViewportPoint(cTopo)
+            local tBase, onB = camera:WorldToViewportPoint(cBase)
+            local tCentro, onC = camera:WorldToViewportPoint(posC)
+            if onT and onB and onC then
+                local raio = math.abs(tBase.Y - tTopo.Y) / 2
+                if not dados.cabeca then
+                    dados.cabeca = Drawing.new("Circle")
+                    dados.cabeca.Thickness = 1.5
+                    dados.cabeca.Filled = false
+                    dados.cabeca.NumSides = 24
+                end
+                dados.cabeca.Visible = true
+                dados.cabeca.Radius = raio
+                dados.cabeca.Position = Vector2.new(tCentro.X, tCentro.Y)
+                dados.cabeca.Color = corTime
+            elseif dados.cabeca then
+                dados.cabeca.Visible = false
+            end
+        elseif dados.cabeca then
+            dados.cabeca.Visible = false
+        end
+
+        -- TEXTO
+        if cabeca then
+            local textos = {}
+            if alvoLockado == plr then table.insert(textos, "🔒") end
+            if opcoes.ESP_Nome then table.insert(textos, plr.Name) end
+            if opcoes.ESP_Distancia and localHRP then
+                local d = math.floor((hrp.Position - localHRP.Position).Magnitude)
+                table.insert(textos, "[" .. d .. "m]")
+            end
+            if opcoes.ESP_Vida then table.insert(textos, "HP " .. math.floor(hum.Health)) end
+            if opcoes.ESP_Visible then
+                table.insert(textos, "Visible: " .. (visivel and "Yes" or "No"))
+            end
+            local textoFinal = table.concat(textos, "  ")
+            if #textos > 0 then
+                if not dados.billboard then
+                    local bb = Instance.new("BillboardGui")
+                    bb.Size = UDim2.new(0, 260, 0, 20)
+                    bb.AlwaysOnTop = true
+                    bb.Parent = cabeca
+                    local l = Instance.new("TextLabel")
+                    l.Size = UDim2.new(1, 0, 1, 0)
+                    l.BackgroundTransparency = 1
+                    l.Font = Enum.Font.GothamBold
+                    l.TextStrokeTransparency = 0
+                    l.TextStrokeColor3 = Color3.fromRGB(0,0,0)
+                    l.Parent = bb
+                    dados.billboard = bb
+                    dados.label = l
+                end
+                dados.label.TextSize = opcoes.ESP_NomeSize
+                dados.billboard.StudsOffset = Vector3.new(0, opcoes.ESP_StudsOffset, 0)
+                dados.label.Text = textoFinal
+                dados.label.TextColor3 = corTime
+                dados.billboard.Enabled = naTela
+            elseif dados.billboard then
+                dados.billboard.Enabled = false
+            end
+        end
+
+        -- BOX 2D
+        if opcoes.ESP_Caixa then
+            local posHRP = hrp.Position
+            local tam = hrp.Size
+            local posTopo = posHRP + Vector3.new(0, tam.Y/2 + 3, 0)
+            local posBase = posHRP - Vector3.new(0, tam.Y/2 + 3, 0)
+            local tTopo, onT = camera:WorldToViewportPoint(posTopo)
+            local tBase, onB = camera:WorldToViewportPoint(posBase)
+            if onT and onB then
+                local alturaBase = math.abs(tBase.Y - tTopo.Y)
+                local altura  = alturaBase * (opcoes.ESP_CaixaHeight / 100)
+                local largura = altura * (opcoes.ESP_CaixaWidth / 100)
+                local x = tTopo.X - largura / 2
+                local y = tTopo.Y
+                if not dados.caixa then
+                    dados.caixa = Drawing.new("Square")
+                    dados.caixa.Thickness = 1
+                    dados.caixa.Filled = false
+                end
+                dados.caixa.Visible = true
+                dados.caixa.Size = Vector2.new(largura, altura)
+                dados.caixa.Position = Vector2.new(x, y)
+                dados.caixa.Color = corTime
+            elseif dados.caixa then
+                dados.caixa.Visible = false
+            end
+        elseif dados.caixa then
+            dados.caixa.Visible = false
+        end
+
+        -- HEALTH BAR
+        if opcoes.ESP_BarraVida then
+            local posHRP = hrp.Position
+            local tam = hrp.Size
+            local posTopo = posHRP + Vector3.new(0, tam.Y/2 + 3, 0)
+            local posBase = posHRP - Vector3.new(0, tam.Y/2 + 3, 0)
+            local tTopo, onT = camera:WorldToViewportPoint(posTopo)
+            local tBase, onB = camera:WorldToViewportPoint(posBase)
+            if onT and onB then
+                local altura  = math.abs(tBase.Y - tTopo.Y)
+                local largura = 3
+                local larguraCaixa = altura * (opcoes.ESP_CaixaWidth / 100)
+                local x = tTopo.X + larguraCaixa / 2 + 5
+                local y = tTopo.Y
+                if not dados.barraVidaBorda then
+                    dados.barraVidaBorda = Drawing.new("Square")
+                    dados.barraVidaBorda.Filled = true
+                    dados.barraVidaBorda.Color = Color3.fromRGB(0, 0, 0)
+                end
+                if not dados.barraVidaFundo then
+                    dados.barraVidaFundo = Drawing.new("Square")
+                    dados.barraVidaFundo.Filled = true
+                    dados.barraVidaFundo.Color = Color3.fromRGB(30, 30, 35)
+                end
+                if not dados.barraVidaFill then
+                    dados.barraVidaFill = Drawing.new("Square")
+                    dados.barraVidaFill.Filled = true
+                end
+                local pct = math.clamp(hum.Health / hum.MaxHealth, 0, 1)
+                local hP = altura * pct
+                dados.barraVidaBorda.Visible = true
+                dados.barraVidaBorda.Size = Vector2.new(largura + 2, altura + 2)
+                dados.barraVidaBorda.Position = Vector2.new(x - 1, y - 1)
+                dados.barraVidaFundo.Visible = true
+                dados.barraVidaFundo.Size = Vector2.new(largura, altura)
+                dados.barraVidaFundo.Position = Vector2.new(x, y)
+                dados.barraVidaFill.Visible = true
+                dados.barraVidaFill.Size = Vector2.new(largura, hP)
+                dados.barraVidaFill.Position = Vector2.new(x, y + (altura - hP))
+                if pct > 0.5 then dados.barraVidaFill.Color = Color3.fromRGB(60, 220, 80)
+                elseif pct > 0.25 then dados.barraVidaFill.Color = Color3.fromRGB(240, 200, 30)
+                else dados.barraVidaFill.Color = Color3.fromRGB(255, 60, 60) end
+            else
+                if dados.barraVidaBorda then dados.barraVidaBorda.Visible = false end
+                if dados.barraVidaFundo then dados.barraVidaFundo.Visible = false end
+                if dados.barraVidaFill  then dados.barraVidaFill.Visible  = false end
+            end
+        else
+            if dados.barraVidaBorda then dados.barraVidaBorda.Visible = false end
+            if dados.barraVidaFundo then dados.barraVidaFundo.Visible = false end
+            if dados.barraVidaFill  then dados.barraVidaFill.Visible  = false end
+        end
+
+        -- TRACER
+        if opcoes.ESP_Tracer then
+            local posPe = hrp.Position - Vector3.new(0, 3, 0)
+            local telaPe, onPe = camera:WorldToViewportPoint(posPe)
+            if not dados.tracer then
+                dados.tracer = Drawing.new("Line")
+                dados.tracer.Thickness = 1
+                dados.tracer.Transparency = 0.7
+            end
+            if onPe then
+                dados.tracer.Visible = true
+                dados.tracer.From = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y)
+                dados.tracer.To = Vector2.new(telaPe.X, telaPe.Y)
+                dados.tracer.Color = corTime
+            else
+                dados.tracer.Visible = false
+            end
+        elseif dados.tracer then
+            dados.tracer.Visible = false
+        end
+
+        -- CHAMS
+        if opcoes.ESP_Chams then
+            if not char:FindFirstChild("ESP_Highlight") then
+                local hl = Instance.new("Highlight")
+                hl.Name = "ESP_Highlight"
+                hl.Adornee = char
+                hl.FillColor = corTime
+                hl.FillTransparency = 0.6
+                hl.OutlineColor = corTime
+                hl.OutlineTransparency = 0
+                hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                hl.Parent = char
+            else
+                local hl = char.ESP_Highlight
+                hl.FillColor = corTime
+                hl.OutlineColor = corTime
+            end
+        else
+            if char and char:FindFirstChild("ESP_Highlight") then
+                char.ESP_Highlight:Destroy()
+            end
+        end
+    end
+end)
+
+-- ============================================================
+-- AIMBOT LOOP
+-- ============================================================
+local aimbotMaxDist = 1500
+
+local function resolverOsso(char, nome)
+    if not char then return nil end
+    if nome == "Head" then return char:FindFirstChild("Head")
+    elseif nome == "Neck" then
+        local head = char:FindFirstChild("Head")
+        local ut = char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso")
+        if head and ut then return head, (head.Position + ut.Position) / 2 end
+        return head
+    elseif nome == "Chest" then return char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso")
+    elseif nome == "Pelvis" then return char:FindFirstChild("LowerTorso") or char:FindFirstChild("Torso")
+    end
+    return char:FindFirstChild("Head")
+end
+
+function obterPosicaoAlvo(plr)
+    local char = plr.Character
+    if not char then return nil end
+    local osso, virtualPos = resolverOsso(char, opcoes.TargetBone or "Head")
+    local basePos = virtualPos or (osso and osso.Position)
+    if not basePos then return nil end
+    if not opcoes.Predict then return basePos end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return basePos end
+    local vel = hrp.AssemblyLinearVelocity
+    if not vel or vel.Magnitude < 0.01 then vel = hrp.Velocity end
+    if not vel then return basePos end
+    local fH = opcoes.PredictVal or 0.15
+    return basePos + Vector3.new(vel.X * fH, 0, vel.Z * fH)
+end
+
+local function estaVisivel(char)
+    if not opcoes.VisibleCheck then return true end
+    if not char then return false end
+    local camera = workspace.CurrentCamera
+    local origem = camera.CFrame.Position
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    local head = char:FindFirstChild("Head")
+    local alvo = head or hrp
+    if not alvo then return false end
+    local direcao = alvo.Position - origem
+    local params = RaycastParams.new()
+    params.FilterType = Enum.RaycastFilterType.Exclude
+    params.FilterDescendantsInstances = {LocalPlayer.Character, camera}
+    params.IgnoreWater = true
+    local resultado = workspace:Raycast(origem, direcao, params)
+    if not resultado then return true end
+    return resultado.Instance and resultado.Instance:IsDescendantOf(char)
+end
+
+local function jogadorValido(plr)
+    if not plr or plr == LocalPlayer then return false end
+    local char = plr.Character
+    if not char then return false end
+    local hrp  = char:FindFirstChild("HumanoidRootPart")
+    local hum  = char:FindFirstChild("Humanoid")
+    if not hrp or not hum then return false end
+    if hum.Health <= 0 then return false end
+    if opcoes.VerificarTime and mesmoTime(plr) then return false end
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local dist = (hrp.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+        if dist > aimbotMaxDist then return false end
+    end
+    return true
+end
+
+function encontrarAlvoLock()
+    local camera = workspace.CurrentCamera
+    local referencia
+    if opcoes.AimMode == "Mouse Free" then
+        local mp = UserInputService:GetMouseLocation()
+        referencia = Vector2.new(mp.X, mp.Y)
+    else
+        referencia = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+    end
+    local melhor, melhorDist = nil, math.huge
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if jogadorValido(plr) then
+            local posAlvo = obterPosicaoAlvo(plr)
+            if posAlvo then
+                local posTela, onScreen = camera:WorldToViewportPoint(posAlvo)
+                if onScreen then
+                    local d = (Vector2.new(posTela.X, posTela.Y) - referencia).Magnitude
+                    if d < opcoes.AimFOV and d < melhorDist then
+                        melhorDist = d
+                        melhor = plr
+                    end
+                end
+            end
+        end
+    end
+    return melhor
+end
+
+local function encontrarAlvo()
+    local camera = workspace.CurrentCamera
+    local referencia
+    if opcoes.AimMode == "Mouse Free" then
+        local mp = UserInputService:GetMouseLocation()
+        referencia = Vector2.new(mp.X, mp.Y)
+    else
+        referencia = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+    end
+    local melhor, melhorDist = nil, math.huge
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if jogadorValido(plr) then
+            local posAlvo = obterPosicaoAlvo(plr)
+            if posAlvo then
+                local posTela, onScreen = camera:WorldToViewportPoint(posAlvo)
+                if onScreen then
+                    local d = (Vector2.new(posTela.X, posTela.Y) - referencia).Magnitude
+                    if d < opcoes.AimFOV and d < melhorDist then
+                        if estaVisivel(plr.Character) then
+                            melhorDist = d
+                            melhor = plr
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return melhor
+end
+
+RunService.RenderStepped:Connect(function(dt)
+    if not opcoes.Aimbot then
+        if lockando then alvoLockado = nil; lockando = false end
+        return
+    end
+    local ativo = aimbotSegurando or (opcoes.AimbotToggle and aimbotToggleAtivo)
+    if not ativo then return end
+
+    local alvo
+    if lockando and alvoLockado and alvoLockado.Parent and jogadorValido(alvoLockado) then
+        alvo = alvoLockado
+    elseif lockando and alvoLockado and not jogadorValido(alvoLockado) then
+        alvoLockado = nil
+        lockando = false
+        alvo = encontrarAlvo()
+    else
+        alvo = encontrarAlvo()
+    end
+
+    if not alvo then return end
+    local posAlvo = obterPosicaoAlvo(alvo)
+    if not posAlvo then return end
+
+    local camera = workspace.CurrentCamera
+    local novaCF = CFrame.new(camera.CFrame.Position, posAlvo)
+
+    if opcoes.AimMode == "Mouse Free" then
+        pcall(function()
+            UserInputService.MouseBehavior = Enum.MouseBehavior.Default
+            UserInputService.MouseIconEnabled = true
+        end)
+        if opcoes.Smoothing then
+            local alpha = math.clamp((1.0 / math.max(opcoes.Smoothness, 0.01)) * (dt * 60) * 0.08, 0.02, 1)
+            camera.CFrame = camera.CFrame:Lerp(novaCF, alpha)
+        end
+    else
+        pcall(function()
+            UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
+            UserInputService.MouseIconEnabled = false
+        end)
+        if opcoes.Smoothing then
+            local alpha = math.clamp((1.0 / math.max(opcoes.Smoothness, 0.01)) * (dt * 60) * 0.15, 0.05, 1)
+            camera.CFrame = camera.CFrame:Lerp(novaCF, alpha)
+        else
+            camera.CFrame = novaCF
+        end
+    end
+end)
+
+-- ============================================================
+-- FOV CIRCLE — funciona em 1ª pessoa (centro da tela)
+-- ============================================================
+local fovCircle = Drawing and Drawing.new("Circle")
+if fovCircle then
+    fovCircle.Thickness = 1
+    fovCircle.Filled = false
+    fovCircle.NumSides = 64
+    fovCircle.Color = Color3.fromRGB(180, 130, 255)
+    fovCircle.Visible = false
+end
+
+RunService.RenderStepped:Connect(function()
+    if not fovCircle then return end
+    if not opcoes.DrawFOV then
+        fovCircle.Visible = false
+        return
+    end
+    if main.Visible then
+        fovCircle.Visible = false
+        return
+    end
+
+    local camera = workspace.CurrentCamera
+    if not camera then
+        fovCircle.Visible = false
+        return
+    end
+
+    local centro = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+    local travado = (UserInputService.MouseBehavior == Enum.MouseBehavior.LockCenter)
+
+    if travado then
+        fovCircle.Position = centro
+    else
+        local mp = UserInputService:GetMouseLocation()
+        fovCircle.Position = Vector2.new(mp.X, mp.Y)
+    end
+    fovCircle.Radius = opcoes.AimFOV
+    fovCircle.Visible = true
+end)
+
+-- ============================================================
+-- FLY / NOCLIP / SPEED / INFJUMP / VEHICLE FLY / FREECAM
+-- ============================================================
+local voando = false
+local flyGyro, flyVel
+
+local function pararFly()
+    voando = false
+    local char = LocalPlayer.Character
+    if not char then return end
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if flyGyro then flyGyro:Destroy(); flyGyro = nil end
+    if flyVel then flyVel:Destroy(); flyVel = nil end
+    if hum then hum.PlatformStand = false end
+end
+
+local function iniciarFly()
+    local char = LocalPlayer.Character
+    if not char then return end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not hrp or not hum then return end
+    voando = true
+    hum.PlatformStand = true
+    flyGyro = Instance.new("BodyGyro")
+    flyGyro.P = 9e4
+    flyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+    flyGyro.CFrame = hrp.CFrame
+    flyGyro.Parent = hrp
+    flyVel = Instance.new("BodyVelocity")
+    flyVel.Velocity = Vector3.new(0, 0, 0)
+    flyVel.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+    flyVel.P = 1250
+    flyVel.Parent = hrp
+end
+
+local veiculoVoando = false
+local vehGyro, vehVel
+
+local function pararVehicleFly()
+    veiculoVoando = false
+    if vehGyro then vehGyro:Destroy(); vehGyro = nil end
+    if vehVel  then vehVel:Destroy();  vehVel  = nil end
+end
+
+local function iniciarVehicleFly(veh)
+    if not veh then return end
+    local prim = veh.PrimaryPart or veh:FindFirstChildWhichIsA("BasePart")
+    if not prim then return end
+    veiculoVoando = true
+    vehGyro = Instance.new("BodyGyro")
+    vehGyro.P = 9e4
+    vehGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+    vehGyro.CFrame = prim.CFrame
+    vehGyro.Parent = prim
+    vehVel = Instance.new("BodyVelocity")
+    vehVel.Velocity = Vector3.new(0, 0, 0)
+    vehVel.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+    vehVel.P = 1250
+    vehVel.Parent = prim
+end
+
+local freecamAtiva   = false
+local freecamCFrame  = nil
+local freecamYaw     = 0
+local freecamPitch   = 0
+local oldCameraType  = nil
+local oldCameraSubj  = nil
+
+local function iniciarFreecam()
+    local cam = workspace.CurrentCamera
+    if not cam then return end
+    freecamAtiva  = true
+    freecamCFrame = cam.CFrame
+    freecamYaw    = 0
+    freecamPitch  = 0
+    oldCameraType = cam.CameraType
+    oldCameraSubj = cam.CameraSubject
+    cam.CameraType = Enum.CameraType.Scriptable
+    cam.CameraSubject = nil
+end
+
+local function pararFreecam()
+    freecamAtiva = false
+    local cam = workspace.CurrentCamera
+    if not cam then return end
+    pcall(function()
+        cam.CameraType = oldCameraType or Enum.CameraType.Custom
+        local char = LocalPlayer.Character
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+        cam.CameraSubject = oldCameraSubj or hum
+    end)
+    oldCameraType = nil
+    oldCameraSubj = nil
+end
+
+UserInputService.InputChanged:Connect(function(input, processado)
+    if not freecamAtiva then return end
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        freecamYaw   = freecamYaw   - input.Delta.X * 0.15
+        freecamPitch = math.clamp(freecamPitch - input.Delta.Y * 0.15, -85, 85)
+    end
+end)
+
+RunService.RenderStepped:Connect(function(dt)
+    local char = LocalPlayer.Character
+    if not char then return end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not hrp or not hum then return end
+
+    if opcoes.Fly then
+        if not voando then iniciarFly() end
+        if flyGyro and flyVel then
+            local cam = workspace.CurrentCamera
+            local direcao = Vector3.new(0, 0, 0)
+            local vel = 50
+            if UserInputService:IsKeyDown(Enum.KeyCode.W) then direcao = direcao + cam.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.S) then direcao = direcao - cam.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.A) then direcao = direcao - cam.CFrame.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.D) then direcao = direcao + cam.CFrame.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.Space) then direcao = direcao + Vector3.new(0, 1, 0) end
+            if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then direcao = direcao - Vector3.new(0, 1, 0) end
+            flyVel.Velocity = direcao * vel
+            flyGyro.CFrame = cam.CFrame
+        end
+    else
+        if voando then pararFly() end
+    end
+
+    if opcoes.VehicleFly then
+        local seat = hum.SeatPart
+        if seat then
+            local veiculo = seat.Parent
+            local prim = veiculo and (veiculo.PrimaryPart or veiculo:FindFirstChildWhichIsA("BasePart"))
+            if prim then
+                if not veiculoVoando then iniciarVehicleFly(veiculo) end
+                if vehGyro and vehVel then
+                    local cam = workspace.CurrentCamera
+                    local direcao = Vector3.new(0, 0, 0)
+                    local vel = (opcoes.VehicleFlySpeed or 1.5) * 32
+                    if UserInputService:IsKeyDown(Enum.KeyCode.W) then direcao = direcao + cam.CFrame.LookVector end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.S) then direcao = direcao - cam.CFrame.LookVector end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.A) then direcao = direcao - cam.CFrame.RightVector end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.D) then direcao = direcao + cam.CFrame.RightVector end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.Space) then direcao = direcao + Vector3.new(0, 1, 0) end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then direcao = direcao - Vector3.new(0, 1, 0) end
+                    vehVel.Velocity = direcao * vel
+                    vehGyro.CFrame = CFrame.new(prim.Position, prim.Position + cam.CFrame.LookVector)
+                end
+            end
+        else
+            if veiculoVoando then pararVehicleFly() end
+        end
+    else
+        if veiculoVoando then pararVehicleFly() end
+    end
+
+    if opcoes.Noclip and char then
+        for _, part in ipairs(char:GetDescendants()) do
+            if part:IsA("BasePart") and part.CanCollide then
+                part.CanCollide = false
+            end
+        end
+    end
+
+    if opcoes.Speed then
+        if hum.WalkSpeed ~= opcoes.SpeedVal then hum.WalkSpeed = opcoes.SpeedVal end
+    else
+        if hum.WalkSpeed ~= 16 and hum.WalkSpeed == opcoes.SpeedVal then hum.WalkSpeed = 16 end
+    end
+
+    if opcoes.InfiniteJump and UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+        pcall(function()
+            hum:ChangeState(Enum.HumanoidStateType.Jumping)
+        end)
+    end
+
+    if opcoes.Freecam then
+        if not freecamAtiva then iniciarFreecam() end
+        if freecamCFrame then
+            local cam = workspace.CurrentCamera
+            local vel = (opcoes.FreecamSpeed or 1) * 60 * dt
+            local move = Vector3.new(0, 0, 0)
+            if UserInputService:IsKeyDown(Enum.KeyCode.W) then move = move + cam.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.S) then move = move - cam.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.A) then move = move - cam.CFrame.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.D) then move = move + cam.CFrame.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.Space) then move = move + Vector3.new(0, 1, 0) end
+            if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then move = move - Vector3.new(0, 1, 0) end
+            local base = CFrame.new(freecamCFrame.Position + move * vel)
+            local rot = CFrame.fromEulerAnglesYXZ(
+                math.rad(freecamPitch),
+                math.rad(freecamYaw),
+                0
+            )
+            freecamCFrame = base * rot
+            cam.CFrame = freecamCFrame
+        end
+    else
+        if freecamAtiva then pararFreecam() end
+    end
+end)
+
+local fovOriginal = nil
+RunService.RenderStepped:Connect(function()
+    local cam = workspace.CurrentCamera
+    if not cam then return end
+    if opcoes.CameraFOVAtivo then
+        if fovOriginal == nil then fovOriginal = cam.FieldOfView end
+        local alvo = math.clamp(opcoes.CameraFOV, 1, 120)
+        if math.abs(cam.FieldOfView - alvo) > 0.1 then cam.FieldOfView = alvo end
+    else
+        if fovOriginal ~= nil then
+            cam.FieldOfView = fovOriginal
+            fovOriginal = nil
+        end
+    end
+end)
+
+LocalPlayer.CharacterAdded:Connect(function()
+    voando = false
+    flyGyro, flyVel = nil, nil
+    veiculoVoando = false
+    vehGyro, vehVel = nil, nil
+    freecamAtiva = false
+    alvoLockado = nil
+    lockando = false
+    task.wait(0.5)
+    if opcoes.Noclip then
+        for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
+            if part:IsA("BasePart") then part.CanCollide = false end
+        end
+    end
+end)
+
+-- ============================================================
+-- KEY TIMER + KICK ON EXPIRE
+-- ============================================================
+local function kickarPorExpiracao()
+    if jaKickado then return end
+    jaKickado = true
+
+    pcall(function()
+        if screenGui and screenGui.Parent then
+            local aviso = Instance.new("Frame")
+            aviso.Size = UDim2.new(0, 400, 0, 150)
+            aviso.Position = UDim2.new(0.5, -200, 0.5, -75)
+            aviso.BackgroundColor3 = Color3.fromRGB(30, 10, 10)
+            aviso.BorderSizePixel = 0
+            aviso.ZIndex = 300
+            aviso.Parent = screenGui
+
+            local c = Instance.new("UICorner")
+            c.CornerRadius = UDim.new(0, 8)
+            c.Parent = aviso
+
+            local s = Instance.new("UIStroke")
+            s.Color = Color3.fromRGB(255, 60, 60)
+            s.Thickness = 2
+            s.Parent = aviso
+
+            local t = Instance.new("TextLabel")
+            t.Size = UDim2.new(1, -20, 0, 40)
+            t.Position = UDim2.new(0, 10, 0, 20)
+            t.BackgroundTransparency = 1
+            t.Text = "⛔ KEY EXPIRED"
+            t.TextColor3 = Color3.fromRGB(255, 80, 80)
+            t.Font = Enum.Font.GothamBold
+            t.TextSize = 22
+            t.ZIndex = 301
+            t.Parent = aviso
+
+            local sub = Instance.new("TextLabel")
+            sub.Size = UDim2.new(1, -20, 0, 50)
+            sub.Position = UDim2.new(0, 10, 0, 65)
+            sub.BackgroundTransparency = 1
+            sub.Text = "Your key has expired.\nJoin the Discord to renew it."
+            sub.TextColor3 = Color3.fromRGB(200, 200, 200)
+            sub.Font = Enum.Font.Gotham
+            sub.TextSize = 14
+            sub.TextWrapped = true
+            sub.ZIndex = 301
+            sub.Parent = aviso
+        end
+    end)
+
+    task.wait(3)
+
+    pcall(function()
+        if screenGui and screenGui.Parent then
+            screenGui:Destroy()
+        end
+    end)
+
+    pcall(function()
+        LocalPlayer:Kick("⛔ Your key has expired. Join the Discord to renew: " .. DISCORD_LINK)
+    end)
+
+    task.wait(0.5)
+    pcall(function()
+        LocalPlayer.Character:BreakJoints()
+        game:GetService("Players").LocalPlayer:Kick("KEY EXPIRED")
+    end)
+end
+
+task.spawn(function()
+    while task.wait(1) do
+        if minhaKey and not jaKickado then
+            if LocalPlayer.UserId == DONO.UserId then
+                keyInfoLabel.Text = "KEY: DONO ♾️"
+                keyInfoLabel.TextColor3 = C.Dourado
+            elseif minhaExpiracao >= 99999 * 86400 then
+                keyInfoLabel.Text = "KEY: LIFETIME ♾️"
+                keyInfoLabel.TextColor3 = C.Dourado
+            elseif minhaExpiracao > 0 then
+                local resto = minhaExpiracao - os.time()
+                if resto <= 0 then
+                    keyInfoLabel.Text = "EXPIRED"
+                    keyInfoLabel.TextColor3 = C.Vermelho
+                    kickarPorExpiracao()
+                else
+                    keyInfoLabel.Text = "KEY: " .. formatarTempo(resto)
+                    if resto < 3600 then
+                        keyInfoLabel.TextColor3 = C.Vermelho
+                    elseif resto < 86400 then
+                        keyInfoLabel.TextColor3 = C.Laranja
+                    else
+                        keyInfoLabel.TextColor3 = C.Dourado
+                    end
+                end
+            end
+        end
+    end
+end)
+
+Players.PlayerRemoving:Connect(function(plr)
+    limparESP(plr)
+    ultimoRaycast[plr] = nil
+    cacheVisivel[plr] = nil
+    if alvoLockado == plr then
+        alvoLockado = nil
+        lockando = false
+    end
+end)
+
+-- ============================================================
+-- LOGIN
+-- ============================================================
+local funcaoLiberarMenu
+
+local function handlerValidarKey()
+    local digitada = kgInput.Text
+    if not digitada or #digitada == 0 then
+        kgStatus.Text = "Enter a key."
+        return
+    end
+    local ok, msg, expira = validarKeyInterna(digitada, LocalPlayer.UserId)
+    if ok then
+        jaKickado = false
+        minhaKey = digitada
+        minhaExpiracao = expira or 0
+        kgStatus.TextColor3 = Color3.fromRGB(120, 220, 120)
+        if digitada == DONO.KeyMestra then
+            kgStatus.Text = "Welcome, OWNER! Opening menu..."
+        else
+            kgStatus.Text = "Key valid! Time: " .. msg
+        end
+        task.wait(0.8)
+        keyGui:Destroy()
+        main.Visible = true
+        liberarMouseAgora(999)
+        if funcaoLiberarMenu then funcaoLiberarMenu() end
+    else
+        kgStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
+        kgStatus.Text = "❌ " .. msg
+        kgInput.Text = ""
+    end
+end
+
+kgBtn.MouseButton1Click:Connect(handlerValidarKey)
+kgInput.FocusLost:Connect(function(enter) if enter then handlerValidarKey() end end)
+
+task.spawn(function()
+    task.wait(0.3)
+    local keySalva, expira = tentarLoginAutomatico(LocalPlayer.UserId)
+    if keySalva then
+        minhaKey = keySalva
+        minhaExpiracao = expira or 0
+        if keyGui and keyGui.Parent then keyGui:Destroy() end
+        main.Visible = true
+        liberarMouseAgora(999)
+        if funcaoLiberarMenu then funcaoLiberarMenu() end
+    end
+end)
+
+funcaoLiberarMenu = function()
+    if not abaAtual then
+        if abas["Aimbot"] then
+            abas["Aimbot"].btn.TextColor3 = C.AbaAtivaTxt
+            abas["Aimbot"].bar.Size = UDim2.new(1, 0, 0, 2)
+            abaAtual = "Aimbot"
+            limparColunas()
+            desenharAimbot()
+        end
+    end
+end
+
+print("✅ Syntax Menu v6.7 loaded!")
+print("  Owner: NICOINFERNALX | UserId: 9375423697")
+print("  INSERT = menu | B = aimbot toggle")
+print("  Tab abre inventário sem sumir o mouse")
+print("  FOV funciona em 1ª pessoa")
