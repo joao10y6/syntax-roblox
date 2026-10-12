@@ -1,16 +1,11 @@
 -- ============================================================
 -- SYNTAX MENU v6.7
 -- Hitbox Expander + ESP Visible + Lock + Kick + Binds
--- Dono: NICOINFERNALX (UserId: 9375423697)
 -- ============================================================
 
 -- ============================================================
 -- DONO CONFIG
 -- ============================================================
-local DONO = {
-    UserId    = 9375423697,
-    KeyMestra = "SYNTAX-MASTER",
-}
 
 local DISCORD_LINK = "https://discord.gg/3fwtTtrqdV"
 
