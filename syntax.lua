@@ -7,11 +7,6 @@
 -- ============================================================
 -- DONO CONFIG
 -- ============================================================
-local DONO = {
-    UserId    = 9375423697,
-    KeyMestra = "SYNTAX-MASTER",
-}
-
 local DISCORD_LINK = "https://discord.gg/3fwtTtrqdV"
 
 local TIPOS = {
