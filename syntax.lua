@@ -7,6 +7,11 @@
 -- ============================================================
 -- DONO CONFIG
 -- ============================================================
+local DONO = {
+    UserId    = 9375423697,
+    KeyMestra = "SYNTAX-MASTER",
+}
+
 local DISCORD_LINK = "https://discord.gg/3fwtTtrqdV"
 
 local TIPOS = {
@@ -136,21 +141,10 @@ local Players          = game:GetService("Players")
 local RunService       = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local GuiService       = game:GetService("GuiService")
-local LocalPlayer = Players.LocalPlayer
-local __tentativas = 0
-while not LocalPlayer and __tentativas < 200 do
-    task.wait(0.1)
-    LocalPlayer = Players.LocalPlayer
-    __tentativas = __tentativas + 1
-end
-
-if not LocalPlayer then
-    warn("[SYNTAX] ❌ LocalPlayer não carregou após 20s. Reinicie o jogo ou execute o script de novo depois que o mapa carregar.")
-    return
-end
+local LocalPlayer      = Players.LocalPlayer
 local Lighting         = game:GetService("Lighting")
 
-    if LocalPlayer.UserId == DONO.UserId then
+local ehDono = (LocalPlayer.UserId == DONO.UserId)
 
 -- ============================================================
 -- COLORS
